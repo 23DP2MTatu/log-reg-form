@@ -10,11 +10,8 @@
     <header></header>
     <main>
         <div class="login-cont">
-            <form action="src/php/login.php" method="post" class="log-form">
-                <input type="text" name="name" placeholder="username or email" class="userNameInput">
-                <input type="password" name="password" placeholder="password" class="passwordInput">
-                <input type="submit" value="login">
-            </form>
+            <h1>Welcome!</h1>
+            <a href="src/php/login.php">log in</a>
             <a href="src/php/register.php">register</a>
         </div>
     </main>

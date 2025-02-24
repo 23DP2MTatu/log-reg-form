@@ -9,6 +9,7 @@
 <body>
     <main>
         <div class="login-cont">
+            <h1>Register</h1>
             <form action="register.php" method="post" class="log-form">
                 <input type="text" name="username" placeholder="username" class="userNameInput">
                 <input type="text" name="email" placeholder="email" class="emailNameInput">
