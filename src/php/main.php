@@ -6,6 +6,13 @@
     <title>Document</title>
 </head>
 <body>
+
+    <main>
+        <a href="../../index.php">menu</a>
+    </main>
+
+
+
     <?php
         session_start();
         $name = $_SESSION['username'];

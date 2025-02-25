@@ -22,6 +22,11 @@
         </div>
     </main>
     <?php
+        $host = 'localhost';
+        $dbname = 'postgres';
+        $dbuser = 'postgres';
+        $dbpassword = '1234';
+
         $username = $_POST['username'];
         $email = $_POST['email'];
         $password = $_POST['password'];
@@ -30,36 +35,22 @@
         if (empty($username) || empty($email) || empty($password) || empty($password2)) {
             echo "All fields are required.";
         } else {
-            $username = trim(strtolower($username));
-            $email = trim(strtolower($email));
-            $file = fopen("../csv/data.csv", "r");
-            $test = true;
-            while (($row = fgetcsv($file)) !== false) {
-                if ($row[0] == $username) {
-                    echo 'change username';
-                    fclose($file);
-                    $test = false;
-                    break;
-                
-                } elseif ($row[1] == $email) {
-                    echo 'change email';
-                    fclose($file);
-                    $test = false;
-                    break;
-                }
-            }
-            if ($test) {
-                if($password == $password2) {
-                    $password = password_hash($password, PASSWORD_DEFAULT);
-                    $file = fopen("../csv/data.csv", "a");
-                    fputcsv($file, [$username,$email,$password]);
-                    fclose($file);
-                    session_start();
-                    $_SESSION['username'] = $username;
-                    header('Location: /src/php/main.php');
-                } else {
-                    echo "incorrect password";
-                }
+            if($password == $password2) {
+            
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $username = trim(strtolower($username));
+                $email = trim(strtolower($email));
+                $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $dbuser, $dbpassword);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
+                $stmt->execute(['username' => $username,'email' => $email, 'password' => $password]);
+
+                session_start();
+                $_SESSION['username'] = $username;
+                header('Location: /log-reg-form/src/php/main.php');
+            } else {
+                echo "incorrect password";
             }
         }
     ?>

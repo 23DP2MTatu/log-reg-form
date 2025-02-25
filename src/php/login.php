@@ -20,25 +20,42 @@
         </div>
     </main>
     <?php
-    $name = $_POST['name'];
+
+    $host = 'localhost';
+    $dbname = 'postgres';
+    $dbuser = 'postgres';
+    $dbpassword = '1234';
+
+    $username = $_POST['name'];
     $password = $_POST['password'];
-    if (empty($name) || empty($password)) {
+    
+    if (empty($username) || empty($password)) {
         echo "All fields are required.";
     } else {
-        $file = fopen("../csv/data.csv", "r");
-        while (($row = fgetcsv($file)) !== false) {
-            if ($row[0] == $name || $row[1] == $name) {
-                if(password_verify($password,$row[2])) {
-                    fclose($file);
-                    session_start();
-                    $_SESSION['username'] = $row[0];
-                    header('Location: /src/php/main.php');
-                }
+        try {
+            $username = trim(strtolower($username));
+            $pdo = new PDO("pgsql:host=$host; dbname=$dbname", $dbuser, $dbpassword);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            if (str_contains($username,"@")) {
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :username");
+                $stmt->execute(['username' => $username]);
+            } else {
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
+                $stmt->execute(['username' => $username]);
             }
-        }
-        fclose($file);
-        header('Location: /index.php');
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if(password_verify($password,$user['password'])) {
+                session_start();
+                $_SESSION['username'] = $user['username'];
+                header('Location: /log-reg-form/src/php/main.php');
+            }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
+}
     ?>
 </body>
 </html>
